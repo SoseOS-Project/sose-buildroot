@@ -1,0 +1,7 @@
+config BR2_PACKAGE_SVMD
+	bool "svmd"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	help
+	  SoseOS VM manager daemon: starts and stops VMs on request
+	  from tools over /run/svmd.sock.

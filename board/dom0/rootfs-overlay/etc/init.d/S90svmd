@@ -1,0 +1,27 @@
+#!/bin/sh
+# starts svmd at boot. S90 so it comes after S50xencommons (xenstored)
+
+DAEMON=/usr/bin/svmd
+PIDFILE=/var/run/svmd.pid
+LOG=/var/log/svmd.log
+
+case "$1" in
+	start)
+		printf "Starting svmd: "
+		start-stop-daemon -S -b -m -p "$PIDFILE" -x /bin/sh -- -c "exec $DAEMON >>$LOG 2>&1" \
+			&& echo "OK" || echo "FAIL"
+		;;
+	stop)
+		printf "Stopping svmd: "
+		start-stop-daemon -K -p "$PIDFILE" && echo "OK" || echo "FAIL"
+		rm -f "$PIDFILE"
+		;;
+	restart)
+		"$0" stop
+		"$0" start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+		;;
+esac

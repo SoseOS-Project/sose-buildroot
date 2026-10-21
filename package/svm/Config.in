@@ -1,0 +1,7 @@
+config BR2_PACKAGE_SVM
+	bool "svm"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	help
+	  Command line client for svmd: svm list, svm start <name>,
+	  svm stop <name>.
