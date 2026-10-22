@@ -1,7 +1,0 @@
-config BR2_PACKAGE_SVM_LS
-	bool "svm-ls"
-	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
-	select BR2_PACKAGE_HOST_RUSTC
-	help
-	  Lists running Xen domains and their names by talking to
-	  xenstored over its Unix socket.

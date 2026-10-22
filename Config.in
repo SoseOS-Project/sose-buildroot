@@ -1,3 +1,2 @@
-source "$BR2_EXTERNAL_SOSE_PATH/package/svm-ls/Config.in"
 source "$BR2_EXTERNAL_SOSE_PATH/package/svmd/Config.in"
 source "$BR2_EXTERNAL_SOSE_PATH/package/svm/Config.in"
