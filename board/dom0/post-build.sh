@@ -13,3 +13,7 @@ elif ! grep -q 'ulimit -n \$XENSTORED_MAX_OPEN_FDS; ' "$LAUNCH"; then
 	echo "post-build: launch-xenstore changed, fix the prlimit swap" >&2
 	exit 1
 fi
+
+# xen's own vm autostart/shutdown script. svmd does that job, and at shutdown this
+# one waits up to 5 min for vms that never answer (the "..." that never ends)
+rm -f "$TARGET_DIR/etc/init.d/S60xendomains"

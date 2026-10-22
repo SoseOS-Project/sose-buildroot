@@ -1,9 +1,28 @@
 #!/bin/sh
 # starts svmd at boot. S90 so it comes after S50xencommons (xenstored)
+# at shutdown it also stops every vm, so a stuck vm can't hang dom0
 
 DAEMON=/usr/bin/svmd
 PIDFILE=/var/run/svmd.pid
 LOG=/var/log/svmd.log
+
+stop_daemon() {
+	printf "Stopping svmd: "
+	start-stop-daemon -K -p "$PIDFILE" && echo "OK" || echo "FAIL"
+	rm -f "$PIDFILE"
+}
+
+stop_vms() {
+	printf "Stopping VMs: "
+	# ask every vm to shut down properly, but only wait 10 seconds
+	timeout 10 xl shutdown -a -w >/dev/null 2>&1
+	# whatever's still running after that gets killed.
+	# xl list: header line, then Domain-0, then the vms. 2nd column is the id
+	for id in $(xl list | awk 'NR > 2 { print $2 }'); do
+		xl destroy "$id"
+	done
+	echo "OK"
+}
 
 case "$1" in
 	start)
@@ -12,12 +31,12 @@ case "$1" in
 			&& echo "OK" || echo "FAIL"
 		;;
 	stop)
-		printf "Stopping svmd: "
-		start-stop-daemon -K -p "$PIDFILE" && echo "OK" || echo "FAIL"
-		rm -f "$PIDFILE"
+		stop_vms
+		stop_daemon
 		;;
 	restart)
-		"$0" stop
+		# only restart svmd itself, leave the vms running
+		stop_daemon
 		"$0" start
 		;;
 	*)
