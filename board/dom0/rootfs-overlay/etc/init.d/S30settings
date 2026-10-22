@@ -1,0 +1,13 @@
+#!/bin/sh
+# mounts settings disk, /dev/vda gets mounted at /var/lib/sose
+
+case "$1" in
+        start)
+            mkdir -p /var/lib/sose
+            mount -t ext4 /dev/vda /var/lib/sose || echo "settings disk not mounted"
+            [ -f /var/lib/sose/autostart ] || cp /etc/sose/autostart /var/lib/sose/autostart
+                ;;
+        stop)
+            umount /var/lib/sose
+                ;;
+esac
