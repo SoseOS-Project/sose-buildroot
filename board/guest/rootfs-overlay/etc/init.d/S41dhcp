@@ -1,0 +1,10 @@
+#!/bin/sh
+# vms with a vif line in their .cfg get an eth0, those ask for an address.
+# vms without one have no eth0 and skip this, so they boot without waiting.
+# -b keeps udhcpc trying in the background instead of holding up the boot
+
+case "$1" in
+	start)
+		[ -e /sys/class/net/eth0 ] && udhcpc -b -i eth0
+		;;
+esac

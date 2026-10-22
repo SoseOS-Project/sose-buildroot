@@ -1,0 +1,20 @@
+#!/bin/sh
+# br0 is a switch for the vms, eth0 (the real card) gets plugged into it.
+# dom0 itself gets no address on either, so it can't reach the network.
+# sys-net plugs into br0 too (vif = [ 'bridge=br0' ]) and is the only one online
+
+case "$1" in
+        start)
+            ip link add br0 type bridge
+
+            # no ipv6 either, qemu's network hands out ipv6 addresses on its own.
+            # done before the links come up so there's never a moment with one
+            echo 1 > /proc/sys/net/ipv6/conf/eth0/disable_ipv6
+            echo 1 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
+
+            ip link set eth0 master br0
+            ip addr flush dev eth0
+            ip link set eth0 up
+            ip link set br0 up
+                ;;
+esac
