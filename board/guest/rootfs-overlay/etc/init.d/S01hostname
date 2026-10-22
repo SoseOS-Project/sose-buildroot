@@ -1,0 +1,10 @@
+#!/bin/sh
+# every vm boots the same guest image, so the vm's name comes from the kernel
+# command line (sose.name=<vm>, set in the vm's .cfg) and becomes the hostname
+
+case "$1" in
+	start)
+		name=$(sed -n 's/.*sose\.name=\([^ ]*\).*/\1/p' /proc/cmdline)
+		[ -n "$name" ] && hostname "$name"
+		;;
+esac

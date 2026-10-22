@@ -17,3 +17,12 @@ fi
 # xen's own vm autostart/shutdown script. svmd does that job, and at shutdown this
 # one waits up to 5 min for vms that never answer (the "..." that never ends)
 rm -f "$TARGET_DIR/etc/init.d/S60xendomains"
+
+# ship the guest image (build/guest) inside dom0 so vms can boot it from /boot.
+# build_sose.sh builds the guest first, a missing one only gets a warning
+GUEST="$BASE_DIR/../guest/images/rootfs.cpio.gz"
+if [ -f "$GUEST" ]; then
+	cp "$GUEST" "$TARGET_DIR/boot/guest.cpio.gz"
+else
+	echo "post-build: no guest image at $GUEST, vms won't have a filesystem" >&2
+fi
