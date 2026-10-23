@@ -1,0 +1,11 @@
+#!/bin/sh
+# last thing at boot: tell dom0 this netvm is ready to serve other vms' network cards.
+# by now S60xendriverdomain has started xl devd. svmd waits for this before it
+# starts a vm that uses this netvm.
+# a relative path is this vm's own spot in xenstore, /local/domain/<my id>/data/ready
+
+case "$1" in
+	start)
+		xenstore-write data/ready 1
+		;;
+esac
