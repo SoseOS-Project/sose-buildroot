@@ -1,0 +1,14 @@
+#!/bin/bash
+# xen's vif-bridge (plugs a vm's network card into vmbr0), then marks that bridge
+# port isolated. isolated ports can't talk to each other, only to sys-net itself,
+# so one vm can never reach another vm behind sys-net.
+# xl devd runs this in sys-net, $vif is the card's name in here (vif<domid>.0).
+# vms use it with vif = [ 'backend=sys-net,bridge=vmbr0,script=vif-sose' ]
+
+"$(dirname "$0")/vif-bridge" "$@" || exit $?
+
+case "$1" in
+	online|add)
+		echo 1 > "/sys/class/net/$vif/brport/isolated"
+		;;
+esac

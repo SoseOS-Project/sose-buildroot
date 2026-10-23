@@ -26,3 +26,11 @@ if [ -f "$GUEST" ]; then
 else
 	echo "post-build: no guest image at $GUEST, vms won't have a filesystem" >&2
 fi
+
+# same for the netvm image (build/netvm) that sys-net boots
+NETVM="$BASE_DIR/../netvm/images/rootfs.cpio.gz"
+if [ -f "$NETVM" ]; then
+	cp "$NETVM" "$TARGET_DIR/boot/netvm.cpio.gz"
+else
+	echo "post-build: no netvm image at $NETVM, sys-net won't boot" >&2
+fi

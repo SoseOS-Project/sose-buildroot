@@ -10,7 +10,7 @@ Early and changing a lot. ARM64 only for now, tested in QEMU.
 - `board/dom0/linux-xen.config` - extra kernel options so Linux can run as Xen dom0 from an initramfs
 - `board/dom0/post-build.sh` - swaps `prlimit` for `ulimit` in Xen's xenstored launcher so dom0 doesn't need all of util-linux
 - `board/dom0/rootfs-overlay/` - files copied into dom0 as is: svmd's init script and the VM configs
-- `package/` - svmd, svm and svm-ls from the sose-manager repo, built as Buildroot packages
+- `package/` - svmd and svm from the sose-manager repo, built as Buildroot packages
 - `local.mk` - builds the Xen tools from my own Xen tree so they match the hypervisor
 - `external.mk` - Xen tools without Xen's own qemu
 
@@ -35,7 +35,11 @@ A build repo that sets all of this up in one go is planned.
 From the `SoseOS` folder:
 
 ```
-# xen itself is built separately
+# xen itself is built separately. on arm xen defaults to the SILO security module,
+# which only lets vms talk to dom0. sys-net serves other vms' network cards, so
+# switch the default to dummy (Xen's normal mode, what Qubes uses) before building
+make -C third_party/xen/xen XEN_TARGET_ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
+#   Common Features -> XSM -> Default XSM implementation -> dummy
 make -C third_party/xen XEN_TARGET_ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dist-xen
 
 # dom0
@@ -45,7 +49,7 @@ make -C third_party/buildroot O=$PWD/build/dom0
 
 The first dom0 build takes a while (cross compiler, kernel, Xen tools). The result ends up in `build/dom0/images/`.
 
-Buildroot doesn't notice changes in local packages, so after editing manager code run `make ... svmd-rebuild` (or svm / svm-ls) before `make`.
+Buildroot doesn't notice changes in local packages, so after editing manager code run `make ... svmd-rebuild` (or svm-rebuild) before `make`.
 
 ## Booting in QEMU
 

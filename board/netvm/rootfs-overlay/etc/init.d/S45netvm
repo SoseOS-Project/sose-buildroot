@@ -1,0 +1,24 @@
+#!/bin/sh
+# sys-net shares its connection with the vms behind it.
+# their network cards get plugged into vmbr0 (vif = [ 'backend=sys-net,bridge=vmbr0,script=vif-sose' ]),
+# udhcpd gives them addresses, and nftables.conf rewrites their traffic to go out eth0 (nat)
+
+case "$1" in
+	start)
+		ip link add vmbr0 type bridge
+		ip addr add 10.137.0.1/24 dev vmbr0
+		ip link set vmbr0 up
+
+		# pass packets between vmbr0 and eth0. /etc/nftables.conf decides which ones,
+		# buildroot's S35nftables already loaded it
+		echo 1 > /proc/sys/net/ipv4/ip_forward
+
+		# xl devd (S60xendriverdomain) quits if it can't write its log here.
+		# /var/log is /tmp, empty every boot, and only dom0's xencommons makes this folder
+		mkdir -p /var/log/xen
+
+		mkdir -p /var/lib/misc
+		touch /var/lib/misc/udhcpd.leases
+		udhcpd /etc/udhcpd.conf
+		;;
+esac
